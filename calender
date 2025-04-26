@@ -1,0 +1,660 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'dart:math' show pi, sin, cos;
+
+void main() {
+  runApp(const DysaiApp());
+}
+
+class DysaiApp extends StatelessWidget {
+  const DysaiApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Dysai Calendar',
+      theme: ThemeData(
+        primaryColor: const Color(0xFF234530),
+        scaffoldBackgroundColor: const Color(0xFFF5EDD6), // Match the login/signup screens
+        fontFamily: 'Georgia',
+      ),
+      home: const CalendarScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class CalendarScreen extends StatefulWidget {
+  const CalendarScreen({Key? key}) : super(key: key);
+
+  @override
+  State<CalendarScreen> createState() => _CalendarScreenState();
+}
+
+class _CalendarScreenState extends State<CalendarScreen> {
+  DateTime _currentMonth = DateTime(2024, 4);
+  DateTime? _periodStartDate;
+  DateTime? _periodEndDate;
+  
+  final Color primaryGreen = const Color(0xFF234530);
+  final Color backgroundBeige = const Color(0xFFF5EDD6);
+  final Color selectedGreen = const Color(0xFF98B585);
+  final Color flowerYellow = const Color(0xFFE9C46A);
+  final Color flowerOrange = const Color(0xFFE76F51);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: backgroundBeige,
+      body: Stack(
+        children: [
+          // Top floral decorations
+          ...buildTopFlowers(),
+          
+          // Main content
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 30),
+                    _buildHeader(),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Select the start and end of your period.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: primaryGreen,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 25),
+                    _buildCalendarHeader(),
+                    const SizedBox(height: 15),
+                    _buildCalendarGrid(),
+                    const SizedBox(height: 40),
+                    
+                    // Selected period info
+                    if (_periodStartDate != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: selectedGreen.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: selectedGreen, width: 1.5),
+                        ),
+                        child: Text(
+                          _periodEndDate != null 
+                              ? 'Period: ${DateFormat('MMM d').format(_periodStartDate!)} - ${DateFormat('MMM d').format(_periodEndDate!)} (${_periodEndDate!.difference(_periodStartDate!).inDays + 1} days)'
+                              : 'Start date: ${DateFormat('MMM d').format(_periodStartDate!)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: primaryGreen,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    
+                    _buildContinueButton(),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Text(
+          'dysai',
+          style: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.bold,
+            color: primaryGreen,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Calendar',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: primaryGreen,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalendarHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: Icon(Icons.chevron_left, color: primaryGreen, size: 28),
+          onPressed: _previousMonth,
+        ),
+        Text(
+          DateFormat('MMMM yyyy').format(_currentMonth),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: primaryGreen,
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.chevron_right, color: primaryGreen, size: 28),
+          onPressed: _nextMonth,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalendarGrid() {
+    return Column(
+      children: [
+        _buildWeekdayHeaders(),
+        const SizedBox(height: 10),
+        ..._buildCalendarDays(),
+      ],
+    );
+  }
+
+  Widget _buildWeekdayHeaders() {
+    const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: weekdays.map((day) {
+        return Expanded(
+          child: Text(
+            day,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: primaryGreen,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  List<Widget> _buildCalendarDays() {
+    List<Widget> rows = [];
+    final firstDayOfMonth = DateTime(_currentMonth.year, _currentMonth.month, 1);
+    final daysInMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 0).day;
+    
+    // Calculate the number of blank spaces before the first day
+    int firstWeekdayOfMonth = firstDayOfMonth.weekday % 7; // Adjust for Sunday start
+    
+    // Create calendar rows
+    int dayCounter = 1;
+    for (int week = 0; dayCounter <= daysInMonth; week++) {
+      List<Widget> rowChildren = [];
+      
+      for (int i = 0; i < 7; i++) {
+        if ((week == 0 && i < firstWeekdayOfMonth) || dayCounter > daysInMonth) {
+          // Empty space
+          rowChildren.add(Expanded(child: Container()));
+        } else {
+          final currentDate = DateTime(_currentMonth.year, _currentMonth.month, dayCounter);
+          bool isInPeriod = false;
+          
+          // Check if the date is within the selected period
+          if (_periodStartDate != null && _periodEndDate != null) {
+            isInPeriod = currentDate.compareTo(_periodStartDate!) >= 0 && 
+                         currentDate.compareTo(_periodEndDate!) <= 0;
+          }
+          
+          // Check if it's start or end date
+          bool isStartDate = _periodStartDate != null &&
+                            currentDate.year == _periodStartDate!.year &&
+                            currentDate.month == _periodStartDate!.month &&
+                            currentDate.day == _periodStartDate!.day;
+                            
+          bool isEndDate = _periodEndDate != null &&
+                          currentDate.year == _periodEndDate!.year &&
+                          currentDate.month == _periodEndDate!.month &&
+                          currentDate.day == _periodEndDate!.day;
+                          
+          rowChildren.add(
+            Expanded(
+              child: _buildCalendarDay(
+                day: dayCounter,
+                isInPeriod: isInPeriod,
+                isStartDate: isStartDate,
+                isEndDate: isEndDate,
+                date: currentDate,
+              ),
+            ),
+          );
+          dayCounter++;
+        }
+      }
+      
+      rows.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: rowChildren,
+          ),
+        ),
+      );
+    }
+    
+    return rows;
+  }
+
+  Widget _buildCalendarDay({
+    required int day,
+    required bool isInPeriod,
+    required bool isStartDate,
+    required bool isEndDate,
+    required DateTime date,
+  }) {
+    return GestureDetector(
+      onTap: () => _selectDate(date),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Background for period days
+          if (isInPeriod)
+            Container(
+              width: double.infinity,
+              height: 38,
+              decoration: BoxDecoration(
+                color: selectedGreen,
+                borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(isStartDate ? 19 : 0),
+                  right: Radius.circular(isEndDate ? 19 : 0),
+                ),
+              ),
+            ),
+            
+          // Day number
+          SizedBox(
+            width: double.infinity,
+            height: 38,
+            child: Center(
+              child: Text(
+                day.toString(),
+                style: TextStyle(
+                  color: isInPeriod ? Colors.white : primaryGreen,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          
+          // Decorative flowers on selected days
+          if (isInPeriod)
+            Positioned(
+              right: isEndDate ? 5 : (day % 2 == 0 ? 5 : null),
+              left: isStartDate ? 5 : (day % 2 != 0 ? 5 : null),
+              top: 5,
+              child: CustomPaint(
+                size: const Size(10, 10),
+                painter: SimpleFlowerPainter(
+                  petalColor: flowerYellow.withOpacity(0.9),
+                  centerColor: flowerOrange.withOpacity(0.9),
+                ),
+              ),
+            ),
+            
+          // Start and End labels
+          if (isStartDate)
+            Positioned(
+              bottom: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                color: backgroundBeige.withOpacity(0.7),
+                child: Text(
+                  'Start',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: primaryGreen,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            
+          if (isEndDate)
+            Positioned(
+              bottom: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                color: backgroundBeige.withOpacity(0.7),
+                child: Text(
+                  'End',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: primaryGreen,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContinueButton() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: primaryGreen.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _periodStartDate != null && _periodEndDate != null ? _continueTapped : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryGreen,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          disabledBackgroundColor: primaryGreen.withOpacity(0.5),
+          disabledForegroundColor: Colors.white.withOpacity(0.7),
+          elevation: 0,
+        ),
+        child: const Text(
+          'Continue',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> buildTopFlowers() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    return [
+      // Left side flower stem
+      Positioned(
+        top: 20,
+        left: 10,
+        child: CustomPaint(
+          size: const Size(70, 120),
+          painter: FlowerStemPainter(
+            stemColor: primaryGreen,
+            flowerColor: flowerYellow,
+            centerColor: flowerOrange,
+          ),
+        ),
+      ),
+      
+      // Right side flower stem
+      Positioned(
+        top: 20,
+        right: 10,
+        child: CustomPaint(
+          size: const Size(70, 120),
+          painter: FlowerStemPainter(
+            stemColor: primaryGreen,
+            flowerColor: flowerYellow,
+            centerColor: flowerOrange,
+            isRightSide: true,
+          ),
+        ),
+      ),
+      
+      // Top center small flowers
+      Positioned(
+        top: 70,
+        left: screenWidth / 2 - 50,
+        child: CustomPaint(
+          size: const Size(25, 25),
+          painter: SimpleFlowerPainter(
+            petalColor: flowerYellow,
+            centerColor: flowerOrange,
+          ),
+        ),
+      ),
+      
+      Positioned(
+        top: 100,
+        right: screenWidth / 2 - 40,
+        child: CustomPaint(
+          size: const Size(22, 22),
+          painter: SimpleFlowerPainter(
+            petalColor: flowerYellow,
+            centerColor: flowerOrange,
+          ),
+        ),
+      ),
+    ];
+  }
+
+  void _previousMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
+      // Clear selection when changing months
+      _periodStartDate = null;
+      _periodEndDate = null;
+    });
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
+      // Clear selection when changing months
+      _periodStartDate = null;
+      _periodEndDate = null;
+    });
+  }
+
+  void _selectDate(DateTime date) {
+    setState(() {
+      if (_periodStartDate == null || 
+          (_periodStartDate != null && _periodEndDate != null)) {
+        // Start new selection
+        _periodStartDate = date;
+        _periodEndDate = null;
+      } else if (date.compareTo(_periodStartDate!) < 0) {
+        // Selected date is before start date, make it the new start date
+        _periodStartDate = date;
+      } else {
+        // Selected date is after start date, set it as end date
+        _periodEndDate = date;
+      }
+    });
+  }
+
+  void _continueTapped() {
+    if (_periodStartDate != null && _periodEndDate != null) {
+      final days = _periodEndDate!.difference(_periodStartDate!).inDays + 1;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Period set: ${DateFormat('MMM d').format(_periodStartDate!)} - '
+            '${DateFormat('MMM d').format(_periodEndDate!)} ($days days)',
+          ),
+          backgroundColor: primaryGreen,
+        ),
+      );
+      
+      // Here you would navigate to the next screen or save the data
+    }
+  }
+}
+
+// Flower Stem Painter for top decorations
+class FlowerStemPainter extends CustomPainter {
+  final Color stemColor;
+  final Color flowerColor;
+  final Color centerColor;
+  final bool isRightSide;
+  
+  FlowerStemPainter({
+    required this.stemColor,
+    required this.flowerColor,
+    required this.centerColor,
+    this.isRightSide = false,
+  });
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stemPaint = Paint()
+      ..color = stemColor
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+      
+    final leafPaint = Paint()
+      ..color = stemColor
+      ..style = PaintingStyle.fill;
+    
+    // Draw the stem
+    final stemPath = Path();
+    if (isRightSide) {
+      stemPath.moveTo(size.width * 0.3, 0);
+      stemPath.quadraticBezierTo(
+        size.width * 0.4, size.height * 0.5,
+        size.width * 0.3, size.height
+      );
+    } else {
+      stemPath.moveTo(size.width * 0.7, 0);
+      stemPath.quadraticBezierTo(
+        size.width * 0.6, size.height * 0.5,
+        size.width * 0.7, size.height
+      );
+    }
+    canvas.drawPath(stemPath, stemPaint);
+    
+    // Draw leaves
+    final leaf1 = Path();
+    final leaf2 = Path();
+    
+    if (isRightSide) {
+      // First leaf
+      leaf1.moveTo(size.width * 0.3, size.height * 0.3);
+      leaf1.quadraticBezierTo(
+        size.width * 0.1, size.height * 0.35,
+        size.width * 0.3, size.height * 0.4
+      );
+      leaf1.close();
+      
+      // Second leaf
+      leaf2.moveTo(size.width * 0.3, size.height * 0.6);
+      leaf2.quadraticBezierTo(
+        size.width * 0.1, size.height * 0.65,
+        size.width * 0.3, size.height * 0.7
+      );
+      leaf2.close();
+    } else {
+      // First leaf
+      leaf1.moveTo(size.width * 0.7, size.height * 0.3);
+      leaf1.quadraticBezierTo(
+        size.width * 0.9, size.height * 0.35,
+        size.width * 0.7, size.height * 0.4
+      );
+      leaf1.close();
+      
+      // Second leaf
+      leaf2.moveTo(size.width * 0.7, size.height * 0.6);
+      leaf2.quadraticBezierTo(
+        size.width * 0.9, size.height * 0.65,
+        size.width * 0.7, size.height * 0.7
+      );
+      leaf2.close();
+    }
+    
+    canvas.drawPath(leaf1, leafPaint);
+    canvas.drawPath(leaf2, leafPaint);
+    
+    // Draw the flower
+    final flowerCenter = isRightSide 
+        ? Offset(size.width * 0.3, 0)
+        : Offset(size.width * 0.7, 0);
+    
+    // Draw petals
+    final petalPaint = Paint()
+      ..color = flowerColor
+      ..style = PaintingStyle.fill;
+      
+    for (int i = 0; i < 8; i++) {
+      final angle = i * pi / 4;
+      final petalCenter = Offset(
+        flowerCenter.dx + size.width * 0.15 * cos(angle),
+        flowerCenter.dy + size.width * 0.15 * sin(angle)
+      );
+      
+      canvas.drawCircle(petalCenter, size.width * 0.08, petalPaint);
+    }
+    
+    // Draw center
+    final centerPaint = Paint()
+      ..color = centerColor
+      ..style = PaintingStyle.fill;
+    
+    canvas.drawCircle(flowerCenter, size.width * 0.06, centerPaint);
+  }
+  
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Simple Flower Painter (for small decorative flowers)
+class SimpleFlowerPainter extends CustomPainter {
+  final Color petalColor;
+  final Color centerColor;
+  
+  SimpleFlowerPainter({
+    required this.petalColor,
+    required this.centerColor,
+  });
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    final petalPaint = Paint()
+      ..color = petalColor
+      ..style = PaintingStyle.fill;
+      
+    final centerPaint = Paint()
+      ..color = centerColor
+      ..style = PaintingStyle.fill;
+    
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    
+    // Draw petals
+    for (int i = 0; i < 6; i++) {
+      final angle = i * pi / 3;
+      final petalCenter = Offset(
+        center.dx + radius * 0.6 * cos(angle),
+        center.dy + radius * 0.6 * sin(angle)
+      );
+      
+      canvas.drawCircle(petalCenter, radius * 0.4, petalPaint);
+    }
+    
+    // Draw center
+    canvas.drawCircle(center, radius * 0.3, centerPaint);
+  }
+  
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
