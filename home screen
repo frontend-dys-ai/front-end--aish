@@ -50,7 +50,9 @@ class DysaiHomeScreen extends StatelessWidget {
                     // Header
                     _buildHeader(),
                     
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 15),
+                    _buildDivider(), // New divider below the header
+                    const SizedBox(height: 25),
                     
                     // Calendar section
                     _buildCalendarSection(),
@@ -66,6 +68,14 @@ class DysaiHomeScreen extends StatelessWidget {
                         // Mood garden section
                         Expanded(
                           child: _buildMoodGarden(),
+                        ),
+                        
+                        // Vertical divider between Mood Garden and Chat Bot
+                        Container(
+                          height: 80,
+                          width: 1,
+                          color: const Color(0xFFD0CAB0),
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
                         ),
                         
                         // Chat bot section
@@ -129,19 +139,6 @@ class DysaiHomeScreen extends StatelessWidget {
         ),
       ),
       
-      // Beside calendar leaf stem
-      CustomPaint(
-        size: const Size(400, 700),
-        painter: LeafStemPainter(
-          stemColor: const Color(0xFF4D6B44),
-          leafColor: const Color(0xFF4D6B44),
-          positions: [
-            const Offset(360, 210),
-          ],
-          isRightSide: true,
-        ),
-      ),
-      
       // Chat bot leaf stem
       CustomPaint(
         size: const Size(400, 700),
@@ -167,20 +164,6 @@ class DysaiHomeScreen extends StatelessWidget {
         ),
       ),
       
-      // Bottom stems for About Us
-      CustomPaint(
-        size: const Size(400, 700),
-        painter: LeafStemPainter(
-          stemColor: const Color(0xFF4D6B44),
-          leafColor: const Color(0xFF4D6B44),
-          positions: [
-            const Offset(70, 610),
-            const Offset(330, 610),
-          ],
-          isSimpleStem: true,
-        ),
-      ),
-      
       // Yellow flowers - header
       CustomPaint(
         size: const Size(400, 700),
@@ -194,20 +177,7 @@ class DysaiHomeScreen extends StatelessWidget {
             const Color(0xFFE9C46A),
           ],
           flowerSizes: [20.0, 20.0],
-        ),
-      ),
-      
-      // Calendar flower
-      CustomPaint(
-        size: const Size(400, 700),
-        painter: FlowerPainter(
-          flowerPositions: [
-            const Offset(360, 210),
-          ],
-          flowerColors: [
-            const Color(0xFFE9C46A),
-          ],
-          flowerSizes: [20.0],
+          moreDefinedPetals: true, // More defined petals
         ),
       ),
       
@@ -222,6 +192,7 @@ class DysaiHomeScreen extends StatelessWidget {
             const Color(0xFFE9C46A),
           ],
           flowerSizes: [18.0],
+          moreDefinedPetals: true, // More defined petals
         ),
       ),
       
@@ -236,30 +207,7 @@ class DysaiHomeScreen extends StatelessWidget {
             const Color(0xFFE9C46A),
           ],
           flowerSizes: [18.0],
-        ),
-      ),
-      
-      // About us flowers
-      CustomPaint(
-        size: const Size(400, 700),
-        painter: FlowerPainter(
-          flowerPositions: [
-            const Offset(70, 610),
-            const Offset(330, 610),
-          ],
-          flowerColors: [
-            const Color(0xFFE9C46A),
-            const Color(0xFFE9C46A),
-          ],
-          flowerSizes: [18.0, 18.0],
-        ),
-      ),
-      
-      // Mood garden flower in pot
-      CustomPaint(
-        size: const Size(400, 700),
-        painter: FlowerPotPainter(
-          position: const Offset(60, 350),
+          moreDefinedPetals: true, // More defined petals
         ),
       ),
     ];
@@ -306,8 +254,16 @@ class DysaiHomeScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Menstrual cup icon
-        _buildMenstrualCupIcon(),
+        // Calendar icon (replacing menstrual cup)
+        Container(
+          width: 40,
+          height: 40,
+          child: const Icon(
+            Icons.calendar_today_rounded,
+            color: Color(0xFF2D5233),
+            size: 34,
+          ),
+        ),
         const SizedBox(width: 15),
         // Calendar text
         const Text(
@@ -373,7 +329,7 @@ class DysaiHomeScreen extends StatelessWidget {
             _buildDayCell('8'),
             _buildDayCell('9'),
             _buildDayCell('10'),
-            _buildDayCell('11'),
+            _buildDayCell('11', isHighlighted: true), // Highlight 11 instead of 16
             _buildDayCell('12'),
           ],
         ),
@@ -384,7 +340,7 @@ class DysaiHomeScreen extends StatelessWidget {
           children: [
             _buildDayCell('13'),
             _buildDayCell('15'),
-            _buildDayCell('16', isHighlighted: true),
+            _buildDayCell('16'), // No longer highlighted
             _buildDayCell('17'),
             _buildDayCell('18'),
             _buildDayCell('19'),
@@ -448,8 +404,17 @@ class DysaiHomeScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Empty space for flower pot (already in buildFloralElements)
-        const SizedBox(width: 42),
+        // Flower pot (fixed, not in buildFloralElements) with different color flower
+        Container(
+          width: 42,
+          height: 65,
+          child: CustomPaint(
+            painter: FlowerPotPainter(
+              position: const Offset(21, 15),
+              flowerColor: const Color(0xFFFF9B85), // Pink flower for Mood Garden
+            ),
+          ),
+        ),
         const SizedBox(width: 10),
         // Mood garden text
         Column(
@@ -506,35 +471,27 @@ class DysaiHomeScreen extends StatelessWidget {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFF2D5233),
-          width: 2,
-        ),
+        color: const Color(0xFF2D5233),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 20,
-            height: 2,
-            color: const Color(0xFF2D5233),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            width: 20,
-            height: 2,
-            color: const Color(0xFF2D5233),
-          ),
-        ],
+      child: Center(
+        child: Icon(
+          Icons.question_answer_rounded,
+          color: Colors.white,
+          size: 24,
+        ),
       ),
     );
   }
 
   Widget _buildHeatingPadSection() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        // Heating pad icon
+        _buildHeatingPadIcon(),
+        const SizedBox(width: 15),
         // Text
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,9 +514,6 @@ class DysaiHomeScreen extends StatelessWidget {
             ),
           ],
         ),
-        const Spacer(),
-        // Heating pad icon
-        _buildHeatingPadIcon(),
       ],
     );
   }
@@ -576,27 +530,10 @@ class DysaiHomeScreen extends StatelessWidget {
           width: 2,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 8,
-            height: 25,
-            decoration: BoxDecoration(
-              color: const Color(0xFFD0AB7E),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 8,
-            height: 25,
-            decoration: BoxDecoration(
-              color: const Color(0xFFD0AB7E),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ],
+      child: const Icon(
+        Icons.device_thermostat,
+        color: Color(0xFFD0AB7E),
+        size: 28,
       ),
     );
   }
@@ -620,11 +557,13 @@ class FlowerPainter extends CustomPainter {
   final List<Offset> flowerPositions;
   final List<Color> flowerColors;
   final List<double> flowerSizes;
+  final bool moreDefinedPetals;
   
   FlowerPainter({
     required this.flowerPositions,
     required this.flowerColors,
     required this.flowerSizes,
+    this.moreDefinedPetals = false,
   });
   
   @override
@@ -634,48 +573,185 @@ class FlowerPainter extends CustomPainter {
       final color = flowerColors[i];
       final flowerSize = flowerSizes[i];
       
-      // Draw flower petals
-      final petalPaint = Paint()
-        ..color = color
-        ..style = PaintingStyle.fill;
-      
-      for (int j = 0; j < 8; j++) {
-        final angle = j * pi / 4;
+      if (moreDefinedPetals) {
+        // Enhanced petal definition approach
         
-        final petalPath = Path();
-        petalPath.moveTo(position.dx, position.dy);
+        // Draw distinct petals with sharper edges and clearer separation
+        final petalPaint = Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
         
-        final controlPoint1 = Offset(
-          position.dx + flowerSize * 0.7 * cos(angle - 0.4),
-          position.dy + flowerSize * 0.7 * sin(angle - 0.4),
+        // More precise petals with better separation
+        for (int j = 0; j < 8; j++) {
+          final angle = j * pi / 4;
+          
+          // Draw each petal as a more distinct, separated shape
+          final petalPath = Path();
+          
+          // Starting point closer to center but not at center
+          final startPoint = Offset(
+            position.dx + flowerSize * 0.2 * cos(angle),
+            position.dy + flowerSize * 0.2 * sin(angle),
+          );
+          
+          petalPath.moveTo(startPoint.dx, startPoint.dy);
+          
+          // Control points more spread out for defined petal shape
+          final controlPoint1 = Offset(
+            position.dx + flowerSize * 0.6 * cos(angle - 0.3),
+            position.dy + flowerSize * 0.6 * sin(angle - 0.3),
+          );
+          
+          // End point slightly further out for longer petals
+          final endPoint = Offset(
+            position.dx + flowerSize * 1.3 * cos(angle),
+            position.dy + flowerSize * 1.3 * sin(angle),
+          );
+          
+          final controlPoint2 = Offset(
+            position.dx + flowerSize * 0.6 * cos(angle + 0.3),
+            position.dy + flowerSize * 0.6 * sin(angle + 0.3),
+          );
+          
+          // Draw the petal with more pronounced curve
+          petalPath.cubicTo(
+            controlPoint1.dx, controlPoint1.dy,
+            endPoint.dx, endPoint.dy,
+            controlPoint2.dx, controlPoint2.dy,
+          );
+          
+          // Close the path back to starting point
+          petalPath.close();
+          
+          // Fill the petal
+          canvas.drawPath(petalPath, petalPaint);
+          
+          // Add petal outlines for better definition
+          final outlinePaint = Paint()
+            ..color = color.withOpacity(0.8)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.0;
+            
+          canvas.drawPath(petalPath, outlinePaint);
+        }
+        
+        // Draw flower center with gradient effect
+        final centerPaint = Paint()
+          ..color = const Color(0xFFE76F51)
+          ..style = PaintingStyle.fill;
+        
+        canvas.drawCircle(position, flowerSize * 0.4, centerPaint);
+        
+        // Inner center detail
+        final innerCenterPaint = Paint()
+          ..color = const Color(0xFFD35F41)
+          ..style = PaintingStyle.fill;
+        
+        canvas.drawCircle(position, flowerSize * 0.25, innerCenterPaint);
+        
+        // Add tiny highlight for 3D effect
+        final highlightPaint = Paint()
+          ..color = Colors.white.withOpacity(0.6)
+          ..style = PaintingStyle.fill;
+        
+        canvas.drawCircle(
+          Offset(position.dx - flowerSize * 0.07, position.dy - flowerSize * 0.07), 
+          flowerSize * 0.06, 
+          highlightPaint
         );
+      } else {
+        // Original flower drawing approach
+        final petalPaint = Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
         
-        final endPoint = Offset(
-          position.dx + flowerSize * cos(angle),
-          position.dy + flowerSize * sin(angle),
-        );
+        // First draw a background circle for the entire flower
+        canvas.drawCircle(position, flowerSize * 0.8, petalPaint);
         
-        final controlPoint2 = Offset(
-          position.dx + flowerSize * 0.7 * cos(angle + 0.4),
-          position.dy + flowerSize * 0.7 * sin(angle + 0.4),
-        );
+        // Then draw each petal on top to create more definition
+        for (int j = 0; j < 8; j++) {
+          final angle = j * pi / 4;
+          
+          final petalPath = Path();
+          petalPath.moveTo(position.dx, position.dy);
+          
+          // More pronounced control points for better petal definition
+          final controlPoint1 = Offset(
+            position.dx + flowerSize * 0.8 * cos(angle - 0.5),
+            position.dy + flowerSize * 0.8 * sin(angle - 0.5),
+          );
+          
+          final endPoint = Offset(
+            position.dx + flowerSize * 1.1 * cos(angle),
+            position.dy + flowerSize * 1.1 * sin(angle),
+          );
+          
+          final controlPoint2 = Offset(
+            position.dx + flowerSize * 0.8 * cos(angle + 0.5),
+            position.dy + flowerSize * 0.8 * sin(angle + 0.5),
+          );
+          
+          petalPath.cubicTo(
+            controlPoint1.dx, controlPoint1.dy,
+            endPoint.dx, endPoint.dy,
+            controlPoint2.dx, controlPoint2.dy,
+          );
+          
+          petalPath.close();
+          canvas.drawPath(petalPath, petalPaint);
+        }
         
-        petalPath.cubicTo(
-          controlPoint1.dx, controlPoint1.dy,
-          endPoint.dx, endPoint.dy,
-          controlPoint2.dx, controlPoint2.dy,
-        );
+        // Draw outline around each petal for better definition
+        final outlinePaint = Paint()
+          ..color = color.withOpacity(0.6)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.5;
+          
+        for (int j = 0; j < 8; j++) {
+          final angle = j * pi / 4;
+          
+          final petalPath = Path();
+          petalPath.moveTo(position.dx, position.dy);
+          
+          final controlPoint1 = Offset(
+            position.dx + flowerSize * 0.8 * cos(angle - 0.5),
+            position.dy + flowerSize * 0.8 * sin(angle - 0.5),
+          );
+          
+          final endPoint = Offset(
+            position.dx + flowerSize * 1.1 * cos(angle),
+            position.dy + flowerSize * 1.1 * sin(angle),
+          );
+          
+          final controlPoint2 = Offset(
+            position.dx + flowerSize * 0.8 * cos(angle + 0.5),
+            position.dy + flowerSize * 0.8 * sin(angle + 0.5),
+          );
+          
+          petalPath.cubicTo(
+            controlPoint1.dx, controlPoint1.dy,
+            endPoint.dx, endPoint.dy,
+            controlPoint2.dx, controlPoint2.dy,
+          );
+          
+          petalPath.close();
+          canvas.drawPath(petalPath, outlinePaint);
+        }
         
-        petalPath.close();
-        canvas.drawPath(petalPath, petalPaint);
+        // Draw flower center
+        final centerPaint = Paint()
+          ..color = const Color(0xFFE76F51)  // Orange-ish center
+          ..style = PaintingStyle.fill;
+        
+        canvas.drawCircle(position, flowerSize * 0.35, centerPaint);
+        
+        // Add center detail
+        final centerDetailPaint = Paint()
+          ..color = const Color(0xFFD35F41) // Darker orange for detail
+          ..style = PaintingStyle.fill;
+        
+        canvas.drawCircle(position, flowerSize * 0.2, centerDetailPaint);
       }
-      
-      // Draw flower center
-      final centerPaint = Paint()
-        ..color = const Color(0xFFE76F51)  // Orange-ish center
-        ..style = PaintingStyle.fill;
-      
-      canvas.drawCircle(position, flowerSize * 0.3, centerPaint);
     }
   }
   
@@ -773,18 +849,21 @@ class LeafStemPainter extends CustomPainter {
 // Flower Pot Painter
 class FlowerPotPainter extends CustomPainter {
   final Offset position;
+  final Color flowerColor;
   
   FlowerPotPainter({
     required this.position,
+    this.flowerColor = const Color(0xFFE9C46A), // Default is yellow gold
   });
   
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw pot
+    // Draw pot with better definition
     final potPaint = Paint()
       ..color = const Color(0xFFA76D60)
       ..style = PaintingStyle.fill;
     
+    // Pot base
     final potPath = Path();
     potPath.moveTo(position.dx - 14, position.dy + 30);
     potPath.lineTo(position.dx - 14, position.dy + 50);
@@ -793,6 +872,18 @@ class FlowerPotPainter extends CustomPainter {
     potPath.close();
     
     canvas.drawPath(potPath, potPaint);
+    
+    // Add pot rim for better definition
+    final potRimPaint = Paint()
+      ..color = const Color(0xFF8A5A4D)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    
+    final potRimPath = Path();
+    potRimPath.moveTo(position.dx - 16, position.dy + 33);
+    potRimPath.lineTo(position.dx + 16, position.dy + 33);
+    
+    canvas.drawPath(potRimPath, potRimPaint);
     
     // Draw stem
     final stemPaint = Paint()
@@ -806,7 +897,8 @@ class FlowerPotPainter extends CustomPainter {
     
     canvas.drawPath(stemPath, stemPaint);
     
-    // Draw leaf
+    // Draw leaves with better definition
+    // First leaf
     final leafPaint = Paint()
       ..color = const Color(0xFF4D6B44)
       ..style = PaintingStyle.fill;
@@ -814,8 +906,8 @@ class FlowerPotPainter extends CustomPainter {
     final leafPath = Path();
     leafPath.moveTo(position.dx, position.dy);
     leafPath.quadraticBezierTo(
-      position.dx + 20, position.dy + 5,
-      position.dx + 5, position.dy + 15,
+      position.dx + 22, position.dy + 2,
+      position.dx + 8, position.dy + 15,
     );
     leafPath.quadraticBezierTo(
       position.dx + 2, position.dy + 8,
@@ -824,13 +916,31 @@ class FlowerPotPainter extends CustomPainter {
     
     canvas.drawPath(leafPath, leafPaint);
     
-    // Draw flower (reusing FlowerPainter logic)
+    // Second leaf on other side for balance
+    final leafPath2 = Path();
+    leafPath2.moveTo(position.dx, position.dy + 10);
+    leafPath2.quadraticBezierTo(
+      position.dx - 18, position.dy + 12,
+      position.dx - 7, position.dy + 20,
+    );
+    leafPath2.quadraticBezierTo(
+      position.dx - 2, position.dy + 16,
+      position.dx, position.dy + 10,
+    );
+    
+    canvas.drawPath(leafPath2, leafPaint);
+    
+    // Draw flower with better definition (using modified FlowerPainter logic)
     final flowerSize = 15.0;
     final flowerPosition = Offset(position.dx, position.dy - 30);
     final petalPaint = Paint()
-      ..color = const Color(0xFFE9C46A)
+      ..color = flowerColor
       ..style = PaintingStyle.fill;
     
+    // Base flower circle
+    canvas.drawCircle(flowerPosition, flowerSize * 0.8, petalPaint);
+    
+    // Draw each petal
     for (int j = 0; j < 8; j++) {
       final angle = j * pi / 4;
       
@@ -838,18 +948,18 @@ class FlowerPotPainter extends CustomPainter {
       petalPath.moveTo(flowerPosition.dx, flowerPosition.dy);
       
       final controlPoint1 = Offset(
-        flowerPosition.dx + flowerSize * 0.7 * cos(angle - 0.4),
-        flowerPosition.dy + flowerSize * 0.7 * sin(angle - 0.4),
+        flowerPosition.dx + flowerSize * 0.8 * cos(angle - 0.5),
+        flowerPosition.dy + flowerSize * 0.8 * sin(angle - 0.5),
       );
       
       final endPoint = Offset(
-        flowerPosition.dx + flowerSize * cos(angle),
-        flowerPosition.dy + flowerSize * sin(angle),
+        flowerPosition.dx + flowerSize * 1.1 * cos(angle),
+        flowerPosition.dy + flowerSize * 1.1 * sin(angle),
       );
       
       final controlPoint2 = Offset(
-        flowerPosition.dx + flowerSize * 0.7 * cos(angle + 0.4),
-        flowerPosition.dy + flowerSize * 0.7 * sin(angle + 0.4),
+        flowerPosition.dx + flowerSize * 0.8 * cos(angle + 0.5),
+        flowerPosition.dy + flowerSize * 0.8 * sin(angle + 0.5),
       );
       
       petalPath.cubicTo(
@@ -862,12 +972,27 @@ class FlowerPotPainter extends CustomPainter {
       canvas.drawPath(petalPath, petalPaint);
     }
     
-    // Draw flower center
+    // Draw flower center - determine center color based on flower color
+    final centerColor = (flowerColor == const Color(0xFFE9C46A)) 
+        ? const Color(0xFFE76F51)  // Orange center for yellow flower
+        : const Color(0xFFFF7057); // Brighter center for pink flower
+    
     final centerPaint = Paint()
-      ..color = const Color(0xFFE76F51)
+      ..color = centerColor
       ..style = PaintingStyle.fill;
     
-    canvas.drawCircle(flowerPosition, flowerSize * 0.3, centerPaint);
+    canvas.drawCircle(flowerPosition, flowerSize * 0.35, centerPaint);
+    
+    // Add center detail - darken the center color 
+    final centerDetailColor = (flowerColor == const Color(0xFFE9C46A))
+        ? const Color(0xFFD35F41) // Dark orange for yellow flower
+        : const Color(0xFFE55B45); // Darker pink for pink flower
+        
+    final centerDetailPaint = Paint()
+      ..color = centerDetailColor
+      ..style = PaintingStyle.fill;
+    
+    canvas.drawCircle(flowerPosition, flowerSize * 0.2, centerDetailPaint);
   }
   
   @override
