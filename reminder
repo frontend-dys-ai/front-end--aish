@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'dart:math' show pi, sin, cos;
+import 'dart:math' show pi, cos, sin;
 
 void main() {
   runApp(const DysaiApp());
 }
 
 class DysaiApp extends StatelessWidget {
-  const DysaiApp({Key? key}) : super(key: key);
+  const DysaiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class DysaiApp extends StatelessWidget {
 }
 
 class PeriodReminderScreen extends StatelessWidget {
-  const PeriodReminderScreen({Key? key}) : super(key: key);
+  const PeriodReminderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,33 +36,33 @@ class PeriodReminderScreen extends StatelessWidget {
       backgroundColor: backgroundColor,
       body: Stack(
         children: [
-          // Top left leaf decoration
+          // Top left flower
           Positioned(
             left: 20,
             top: 80,
             child: CustomPaint(
-              size: const Size(80, 120),
-              painter: LeafStemPainter(
-                color: primaryGreen.withOpacity(0.7),
-                isRightFacing: false,
+              size: const Size(60, 60),
+              painter: FlowerPainter(
+                petalColor: Colors.white.withOpacity(0.8),
+                centerColor: const Color(0xFFE6C27A),
               ),
             ),
           ),
-          
-          // Top right leaf decoration
+
+          // Top right flower
           Positioned(
             right: 20,
             top: 80,
             child: CustomPaint(
-              size: const Size(80, 120),
-              painter: LeafStemPainter(
-                color: primaryGreen.withOpacity(0.7),
-                isRightFacing: true,
+              size: const Size(60, 60),
+              painter: FlowerPainter(
+                petalColor: Colors.white.withOpacity(0.8),
+                centerColor: const Color(0xFFE6C27A),
               ),
             ),
           ),
-          
-          // Bottom flower and leaf decoration
+
+          // Bottom right flower + stem
           Positioned(
             right: 20,
             bottom: 40,
@@ -70,13 +70,13 @@ class PeriodReminderScreen extends StatelessWidget {
               size: const Size(120, 180),
               painter: FlowerStemPainter(
                 stemColor: primaryGreen.withOpacity(0.7),
-                flowerColor: const Color(0xFFF5E9C0),
+                flowerColor: creamColor,
                 centerColor: const Color(0xFFE6C27A),
               ),
             ),
           ),
-          
-          // Main Content
+
+          // Main content
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -95,7 +95,6 @@ class PeriodReminderScreen extends StatelessWidget {
                           color: primaryGreen,
                           fontSize: 45,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Georgia',
                         ),
                       ),
                       const SizedBox(height: 50),
@@ -105,7 +104,6 @@ class PeriodReminderScreen extends StatelessWidget {
                           color: primaryGreen,
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Georgia',
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -116,7 +114,6 @@ class PeriodReminderScreen extends StatelessWidget {
                           color: primaryGreen,
                           fontSize: 22,
                           height: 1.4,
-                          fontFamily: 'Georgia',
                         ),
                       ),
                       const SizedBox(height: 50),
@@ -153,7 +150,6 @@ class PeriodReminderScreen extends StatelessWidget {
                   color: primaryGreen,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Georgia',
                 ),
               ),
               Text(
@@ -161,7 +157,6 @@ class PeriodReminderScreen extends StatelessWidget {
                 style: TextStyle(
                   color: primaryGreen,
                   fontSize: 24,
-                  fontFamily: 'Georgia',
                 ),
               ),
             ],
@@ -197,7 +192,6 @@ class PeriodReminderScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Georgia',
           ),
         ),
       ),
@@ -205,111 +199,27 @@ class PeriodReminderScreen extends StatelessWidget {
   }
 }
 
-class LeafStemPainter extends CustomPainter {
-  final Color color;
-  final bool isRightFacing;
-  
-  LeafStemPainter({required this.color, required this.isRightFacing});
-  
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    
-    // Draw stem
-    final stemPath = Path();
-    
-    if (isRightFacing) {
-      stemPath.moveTo(size.width * 0.7, 0);
-      stemPath.lineTo(size.width * 0.8, size.height * 0.9);
-      stemPath.lineTo(size.width * 0.9, size.height * 0.9);
-      stemPath.lineTo(size.width * 0.8, 0);
-      stemPath.close();
-    } else {
-      stemPath.moveTo(size.width * 0.3, 0);
-      stemPath.lineTo(size.width * 0.2, size.height * 0.9);
-      stemPath.lineTo(size.width * 0.1, size.height * 0.9);
-      stemPath.lineTo(size.width * 0.2, 0);
-      stemPath.close();
-    }
-    
-    canvas.drawPath(stemPath, paint);
-    
-    // Draw leaves
-    for (int i = 0; i < 3; i++) {
-      final leafY = size.height * (0.2 + i * 0.3);
-      final leafSize = size.width * 0.5;
-      
-      final leafPath = Path();
-      if (isRightFacing) {
-        leafPath.moveTo(size.width * 0.8, leafY);
-        leafPath.quadraticBezierTo(
-          size.width * 0.4, leafY - leafSize * 0.3, 
-          size.width * 0.2, leafY - leafSize * 0.1
-        );
-        leafPath.quadraticBezierTo(
-          size.width * 0.4, leafY + leafSize * 0.3, 
-          size.width * 0.8, leafY
-        );
-      } else {
-        leafPath.moveTo(size.width * 0.2, leafY);
-        leafPath.quadraticBezierTo(
-          size.width * 0.6, leafY - leafSize * 0.3, 
-          size.width * 0.8, leafY - leafSize * 0.1
-        );
-        leafPath.quadraticBezierTo(
-          size.width * 0.6, leafY + leafSize * 0.3, 
-          size.width * 0.2, leafY
-        );
-      }
-      leafPath.close();
-      
-      canvas.drawPath(leafPath, paint);
-    }
-  }
-  
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
 class FlowerPainter extends CustomPainter {
   final Color petalColor;
   final Color centerColor;
-  
+
   FlowerPainter({required this.petalColor, required this.centerColor});
-  
+
   @override
   void paint(Canvas canvas, Size size) {
-    final petalPaint = Paint()
-      ..color = petalColor
-      ..style = PaintingStyle.fill;
-    
-    final centerPaint = Paint()
-      ..color = centerColor
-      ..style = PaintingStyle.fill;
-    
-    // Draw petals
+    final petalPaint = Paint()..color = petalColor;
+    final centerPaint = Paint()..color = centerColor;
+
     for (int i = 0; i < 8; i++) {
       final angle = 2 * pi * i / 8;
       final x = size.width / 2 + size.width * 0.4 * cos(angle);
       final y = size.height / 2 + size.height * 0.4 * sin(angle);
-      
-      canvas.drawCircle(
-        Offset(x, y),
-        size.width * 0.25,
-        petalPaint,
-      );
+      canvas.drawCircle(Offset(x, y), size.width * 0.25, petalPaint);
     }
-    
-    // Draw center
-    canvas.drawCircle(
-      Offset(size.width / 2, size.height / 2),
-      size.width * 0.15,
-      centerPaint,
-    );
+
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), size.width * 0.15, centerPaint);
   }
-  
+
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
@@ -318,91 +228,65 @@ class FlowerStemPainter extends CustomPainter {
   final Color stemColor;
   final Color flowerColor;
   final Color centerColor;
-  
+
   FlowerStemPainter({
     required this.stemColor,
     required this.flowerColor,
     required this.centerColor,
   });
-  
+
   @override
   void paint(Canvas canvas, Size size) {
     final stemPaint = Paint()
       ..color = stemColor
-      ..style = PaintingStyle.fill
+      ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-    
-    // Main stem
+
     final stemPath = Path()
       ..moveTo(size.width * 0.5, size.height * 0.9)
       ..quadraticBezierTo(
         size.width * 0.1, size.height * 0.7,
-        size.width * 0.2, size.height * 0.2
+        size.width * 0.2, size.height * 0.2,
       );
-    
-    canvas.drawPath(stemPath, stemPaint..style = PaintingStyle.stroke);
-    
+
+    canvas.drawPath(stemPath, stemPaint);
+
     // Draw leaves
-    _drawLeaf(canvas, stemPaint, size.width * 0.25, size.height * 0.3, -20, size.width * 0.2);
-    _drawLeaf(canvas, stemPaint, size.width * 0.35, size.height * 0.5, -30, size.width * 0.22);
-    _drawLeaf(canvas, stemPaint, size.width * 0.42, size.height * 0.65, -40, size.width * 0.25);
-    _drawLeaf(canvas, stemPaint, size.width * 0.47, size.height * 0.8, -50, size.width * 0.28);
-    
-    // Draw flower
-    _drawFlower(
-      canvas,
-      Offset(size.width * 0.2, size.height * 0.1),
-      size.width * 0.15,
-      flowerColor,
-      centerColor,
-    );
+    _drawLeaf(canvas, size.width * 0.25, size.height * 0.3, -20, size.width * 0.2, stemPaint);
+    _drawLeaf(canvas, size.width * 0.35, size.height * 0.5, -30, size.width * 0.22, stemPaint);
+    _drawLeaf(canvas, size.width * 0.42, size.height * 0.65, -40, size.width * 0.25, stemPaint);
+    _drawLeaf(canvas, size.width * 0.47, size.height * 0.8, -50, size.width * 0.28, stemPaint);
+
+    _drawFlower(canvas, Offset(size.width * 0.2, size.height * 0.1), size.width * 0.15);
   }
-  
-  void _drawLeaf(Canvas canvas, Paint paint, double x, double y, double angle, double size) {
+
+  void _drawLeaf(Canvas canvas, double x, double y, double angle, double size, Paint paint) {
     canvas.save();
     canvas.translate(x, y);
     canvas.rotate(angle * pi / 180);
-    
     final leafPath = Path()
       ..moveTo(0, 0)
       ..quadraticBezierTo(size * 0.5, -size * 0.3, size, -size * 0.1)
       ..quadraticBezierTo(size * 0.6, size * 0.3, 0, 0)
       ..close();
-    
     canvas.drawPath(leafPath, paint..style = PaintingStyle.fill);
     canvas.restore();
   }
-  
-  void _drawFlower(Canvas canvas, Offset center, double radius, Color petalColor, Color centerColor) {
-    final petalPaint = Paint()
-      ..color = flowerColor
-      ..style = PaintingStyle.fill;
-      
-    final centerPaint = Paint()
-      ..color = centerColor
-      ..style = PaintingStyle.fill;
-    
-    // Draw petals
+
+  void _drawFlower(Canvas canvas, Offset center, double radius) {
+    final petalPaint = Paint()..color = flowerColor;
+    final centerPaint = Paint()..color = centerColor;
+
     for (int i = 0; i < 8; i++) {
       final angle = 2 * pi * i / 8;
       final x = center.dx + radius * 0.8 * cos(angle);
       final y = center.dy + radius * 0.8 * sin(angle);
-      
-      canvas.drawCircle(
-        Offset(x, y),
-        radius * 0.6,
-        petalPaint,
-      );
+      canvas.drawCircle(Offset(x, y), radius * 0.6, petalPaint);
     }
-    
-    // Draw center
-    canvas.drawCircle(
-      center,
-      radius * 0.3,
-      centerPaint,
-    );
+
+    canvas.drawCircle(center, radius * 0.3, centerPaint);
   }
-  
+
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
